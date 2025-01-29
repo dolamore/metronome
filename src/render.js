@@ -265,18 +265,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function startMetronome() {
-    isPlaying = true;
-    isPendulumMode = true;
-
-    const noteSize = noteSizes[currentNoteSizeIndex]; // Get the current note size
-    Tone.Transport.bpm.value = bpm;
-
-    const flashingBar = document.querySelector('.flashing-bar');
-    const sequence = getMetronomeSequence();
-
+function createMetronomeLoop(noteSize) {
     let count = 0;
-    loop = new Tone.Loop((time) => {
+    const sequence = getMetronomeSequence(); // Получаем текущую последовательность битов
+
+    return new Tone.Loop((time) => {
         const currentNote = document.querySelector(`.beat[data-beat="${count % sequence.length}"]`);
         currentNote.classList.add('playing');
         const {sound, settings} = sequence[count % sequence.length];
@@ -289,17 +282,31 @@ function startMetronome() {
         }
 
         // Flash the bar
+        const flashingBar = document.querySelector('.flashing-bar');
         flashingBar.style.opacity = 1;
         setTimeout(() => {
             flashingBar.style.opacity = 0;
             currentNote.classList.remove('playing');
         }, 100); // Flash duration
         count++;
-    }, noteSize).start(0);
+    }, noteSize); // Возвращаем луп, не стартуя его сразу
+}
+
+function startMetronome() {
+    isPlaying = true;
+    isPendulumMode = true;
+
+    const noteSize = noteSizes[currentNoteSizeIndex]; // Получаем текущий размер ноты
+    Tone.Transport.bpm.value = bpm;
+
+    // Создаем новый луп с нужными параметрами
+    loop = createMetronomeLoop(noteSize);
+
+    loop.start(0); // Стартуем луп
 
     Tone.Transport.start();
     document.getElementById('start-stop').textContent = 'Stop';
-    movePendulum(); // Start the pendulum
+    movePendulum(); // Запускаем анимацию маятника
 }
 
 function changeBeatSound(beatElement) {
