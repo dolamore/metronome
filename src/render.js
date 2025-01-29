@@ -20,6 +20,7 @@ let soundSettings = [
 let bpm = 120;
 let isPlaying = false;
 let loop;
+let count = 0;
 let isPendulumMode = false;
 let metronomeBuffer = [];
 let pendulumAnimationFrame;
@@ -266,7 +267,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function createMetronomeLoop(noteSize) {
-    let count = 0;
     const sequence = getMetronomeSequence(); // Получаем текущую последовательность битов
 
     return new Tone.Loop((time) => {
@@ -392,6 +392,7 @@ function stopMetronome() {
     // Сбросить маятник в начальное положение
     const pendulumElement = document.querySelector('.pendulum');
     pendulumElement.style.left = '0px';
+    count = 0;
 }
 
 function handleBpmChange(newBpm) {
